@@ -1,0 +1,455 @@
+/*
+<<<<<<< HEAD
+This source code file is part of thread_mpi.  
+Written by Sander Pronk, Erik Lindahl, and possibly others. 
+
+Copyright (c) 2009, Sander Pronk, Erik Lindahl.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+1) Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2) Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3) Neither the name of the copyright holders nor the
+   names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY US ''AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL WE BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+If you want to redistribute modifications, please consider that
+scientific software is very special. Version control is crucial -
+bugs must be traceable. We will be happy to consider code for
+inclusion in the official distribution, but derived work should not
+be called official thread_mpi. Details are found in the README & COPYING
+files.
+*/
+=======
+   This source code file is part of thread_mpi.
+   Written by Sander Pronk, Erik Lindahl, and possibly others.
+
+   Copyright (c) 2009, Sander Pronk, Erik Lindahl.
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+   1) Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+   2) Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+   3) Neither the name of the copyright holders nor the
+   names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY US ''AS IS'' AND ANY
+   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL WE BE LIABLE FOR ANY
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   If you want to redistribute modifications, please consider that
+   scientific software is very special. Version control is crucial -
+   bugs must be traceable. We will be happy to consider code for
+   inclusion in the official distribution, but derived work should not
+   be called official thread_mpi. Details are found in the README & COPYING
+   files.
+ */
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+
+
+/* NOTE:
+
+ ***************************************************************************
+<<<<<<< HEAD
+  this file is not used any more. gcc intrinsics take care of the atomics 
+***************************************************************************
+
+*/
+=======
+   this file is not used any more. gcc intrinsics take care of the atomics
+ ***************************************************************************
+
+ */
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+
+#error included gcc_ppc.h. This file is outdated
+
+
+
+typedef struct tMPI_Atomic
+{
+    volatile int value;   /*!< Volatile, to avoid compiler aliasing */
+}
+tMPI_Atomic_t;
+
+typedef struct tMPI_Atomic_ptr
+{
+    void* volatile* value;   /*!< Volatile, to avoid compiler aliasing */
+}
+tMPI_Atomic_ptr_t;
+
+
+typedef struct tMPI_Spinlock
+{
+    volatile unsigned int lock;   /*!< Volatile, to avoid compiler aliasing */
+}
+tMPI_Spinlock_t;
+
+
+#define TMPI_SPINLOCK_INITIALIZER   { 0 }
+
+#define TMPI_HAVE_SWAP
+
+<<<<<<< HEAD
+#define tMPI_Atomic_get(a)        ((a)->value) 
+#define tMPI_Atomic_set(a,i)     (((a)->value) = (i))
+
+#define tMPI_Atomic_ptr_get(a)    (void*)((a)->value) 
+#define tMPI_Atomic_ptr_set(a,i)  (((a)->value) = (void*)(i))
+
+
+#if (TMPI_GCC_VERSION >= 40100) 
+=======
+#define tMPI_Atomic_get(a)        ((a)->value)
+#define tMPI_Atomic_set(a, i)     (((a)->value) = (i))
+
+#define tMPI_Atomic_ptr_get(a)    (void*)((a)->value)
+#define tMPI_Atomic_ptr_set(a, i)  (((a)->value) = (void*)(i))
+
+
+#if (TMPI_GCC_VERSION >= 40100)
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+
+#include "gcc_intrinsics.h"
+
+#else
+
+/* Compiler-dependent stuff: GCC memory barrier */
+<<<<<<< HEAD
+#define tMPI_Atomic_memory_barrier() __asm__ __volatile__("isync": : :"memory")
+=======
+#define tMPI_Atomic_memory_barrier() __asm__ __volatile__("isync" : : : "memory")
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+
+
+
+#define TMPI_HAVE_ASM_SWAP
+static inline int tMPI_Atomic_swap(tMPI_Atomic_t *a, int b)
+{
+    int ret;
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    __asm__ __volatile__ ("1:    lwarx   %0,0,%2 \n"
+                          "\tstwcx.  %3,0,%2 \n"
+                          "\tbne-    1b\n"
+                          : "=&r" (ret), "=m" (a->value)
+                          : "r" (&(a->value)), "r" (b)
+                          : "cc", "memory");
+<<<<<<< HEAD
+   
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    return ret;
+}
+
+static inline void* tMPI_Atomic_ptr_swap(tMPI_Atomic_ptr_t *a, void *b)
+{
+    int ret;
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+#if (!defined(__PPC64__)) && (!defined(__ppc64))
+    __asm__ __volatile__ ("1:    lwarx   %0,0,%2 \n"
+                          "\tstwcx.  %3,0,%2 \n"
+                          "\tbne-    1b\n"
+                          : "=&r" (ret), "=m" (a->value)
+                          : "r" (&(a->value)), "r" (b)
+                          : "cc", "memory");
+#else
+    __asm__ __volatile__ ("1:    ldarx   %0,0,%2 \n"
+                          "\tstdcx.  %3,0,%2 \n"
+                          "\tbne-    1b\n"
+                          : "=&r" (ret), "=m" (a->value)
+                          : "r" (&(a->value)), "r" (b)
+                          : "cc", "memory");
+#endif
+<<<<<<< HEAD
+   
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    return ret;
+}
+
+
+
+static inline int tMPI_Atomic_cas(tMPI_Atomic_t *a, int oldval, int newval)
+{
+    int prev;
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    __asm__ __volatile__ ("1:    lwarx   %0,0,%2 \n"
+                          "\tcmpw    0,%0,%3 \n"
+                          "\tbne     2f \n"
+                          "\tstwcx.  %4,0,%2 \n"
+                          "bne-    1b\n"
+                          "\tsync\n"
+                          "2:\n"
+                          : "=&r" (prev), "=m" (a->value)
+<<<<<<< HEAD
+                          : "r" (&a->value), "r" (oldval), "r" (newval), 
+                            "m" (a->value)
+                          : "cc", "memory");
+    
+    return prev==oldval;
+=======
+                          : "r" (&a->value), "r" (oldval), "r" (newval),
+                          "m" (a->value)
+                          : "cc", "memory");
+
+    return prev == oldval;
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+}
+
+
+static inline int tMPI_Atomic_ptr_cas(tMPI_Atomic_ptr_t *a, void *oldval,
+<<<<<<< HEAD
+                                        void *newval)
+{
+    void *prev;
+   
+=======
+                                      void *newval)
+{
+    void *prev;
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+#if (!defined(__PPC64__)) && (!defined(__ppc64))
+    __asm__ __volatile__ ("1:    lwarx   %0,0,%2 \n"
+                          "\tcmpw    0,%0,%3 \n"
+                          "\tbne     2f \n"
+                          "\tstwcx.  %4,0,%2 \n"
+                          "bne-    1b\n"
+                          "\tsync\n"
+                          "2:\n"
+                          : "=&r" (prev), "=m" (a->value)
+<<<<<<< HEAD
+                          : "r" (&a->value), "r" (oldval), "r" (newval), 
+                            "m" (a->value)
+=======
+                          : "r" (&a->value), "r" (oldval), "r" (newval),
+                          "m" (a->value)
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+                          : "cc", "memory");
+#else
+    __asm__ __volatile__ ("1:    ldarx   %0,0,%2 \n"
+                          "\tcmpd    0,%0,%3 \n"
+                          "\tbne     2f \n"
+                          "\tstdcx.  %4,0,%2 \n"
+                          "bne-    1b\n"
+                          "\tsync\n"
+                          "2:\n"
+                          : "=&r" (prev), "=m" (a->value)
+<<<<<<< HEAD
+                          : "r" (&a->value), "r" (oldval), "r" (newval), 
+                            "m" (a->value)
+                          : "cc", "memory");
+#endif
+    return prev==oldval;
+=======
+                          : "r" (&a->value), "r" (oldval), "r" (newval),
+                          "m" (a->value)
+                          : "cc", "memory");
+#endif
+    return prev == oldval;
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+}
+
+static inline int tMPI_Atomic_add_return(tMPI_Atomic_t *a, int i)
+{
+    int t;
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    __asm__ __volatile__("1:     lwarx   %0,0,%2\n"
+                         "\tadd     %0,%1,%0\n"
+                         "\tstwcx.  %0,0,%2 \n"
+                         "\tbne-    1b\n"
+                         "\tisync\n"
+                         : "=&r" (t)
+                         : "r" (i), "r" (&a->value)
+<<<<<<< HEAD
+                         : "cc" , "memory");
+=======
+                         : "cc", "memory");
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    return t;
+}
+
+
+
+static inline int tMPI_Atomic_fetch_add(tMPI_Atomic_t *a, int i)
+{
+    int t;
+<<<<<<< HEAD
+    
+    __asm__ __volatile__("\teieio\n"
+                         "1:     lwarx   %0,0,%2\n"                         
+=======
+
+    __asm__ __volatile__("\teieio\n"
+                         "1:     lwarx   %0,0,%2\n"
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+                         "\tadd     %0,%1,%0\n"
+                         "\tstwcx.  %0,0,%2 \n"
+                         "\tbne-    1b\n"
+                         "\tisync\n"
+                         : "=&r" (t)
+                         : "r" (i), "r" (&a->value)
+                         : "cc", "memory");
+<<<<<<< HEAD
+    
+    return (t - i);    
+=======
+
+    return (t - i);
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+}
+
+
+#endif
+
+
+static inline void tMPI_Spinlock_init(tMPI_Spinlock_t *x)
+{
+    x->lock = 0;
+}
+
+
+
+static inline void tMPI_Spinlock_lock(tMPI_Spinlock_t *x)
+{
+    unsigned int tmp;
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    __asm__ __volatile__("\tb      1f\n"
+                         "2:      lwzx    %0,0,%1\n"
+                         "\tcmpwi   0,%0,0\n"
+                         "\tbne+    2b\n"
+                         "1:      lwarx   %0,0,%1\n"
+                         "\tcmpwi   0,%0,0\n"
+                         "\tbne-    2b\n"
+                         "\tstwcx.  %2,0,%1\n"
+                         "bne-    2b\n"
+                         "\tisync\n"
+<<<<<<< HEAD
+                         : "=&r"(tmp)
+                         : "r"(&x->lock), "r"(1)
+=======
+                         : "=&r" (tmp)
+                         : "r" (&x->lock), "r" (1)
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+                         : "cr0", "memory");
+}
+
+
+static inline int tMPI_Spinlock_trylock(tMPI_Spinlock_t *x)
+{
+<<<<<<< HEAD
+    unsigned int old, t;
+    unsigned int mask = 1;
+    volatile unsigned int *p = &x->lock;
+    
+=======
+    unsigned int           old, t;
+    unsigned int           mask = 1;
+    volatile unsigned int *p    = &x->lock;
+
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    __asm__ __volatile__("\teieio\n"
+                         "1:      lwarx   %0,0,%4 \n"
+                         "\tor      %1,%0,%3 \n"
+                         "\tstwcx.  %1,0,%4 \n"
+                         "\tbne     1b\n"
+                         "\tsync\n"
+                         : "=&r" (old), "=&r" (t), "=m" (*p)
+                         : "r" (mask), "r" (p), "m" (*p)
+                         : "cc", "memory");
+<<<<<<< HEAD
+    
+    return (old & mask);    
+=======
+
+    return (old & mask);
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+}
+
+
+static inline void tMPI_Spinlock_unlock(tMPI_Spinlock_t *x)
+{
+<<<<<<< HEAD
+    __asm__ __volatile__("\teieio\n": : :"memory");
+=======
+    __asm__ __volatile__("\teieio\n" : : : "memory");
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+    x->lock = 0;
+}
+
+
+static inline int tMPI_Spinlock_islocked(const tMPI_Spinlock_t *x)
+{
+    return ( x->lock != 0);
+}
+
+
+static inline void tMPI_Spinlock_wait(tMPI_Spinlock_t *x)
+{
+<<<<<<< HEAD
+    do 
+    {
+        tMPI_Atomic_memory_barrier(); 
+    }
+    while(tMPI_Spinlock_islocked(x));
+}
+
+
+
+=======
+    do
+    {
+        tMPI_Atomic_memory_barrier();
+    }
+    while (tMPI_Spinlock_islocked(x));
+}
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2

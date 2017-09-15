@@ -1,0 +1,17 @@
+libdir=@LIB_INSTALL_DIR@
+includedir=@INCL_INSTALL_DIR@
+
+Name: libgmx
+Description: Gromacs default lib
+URL: http://www.gromacs.org
+Version: @PROJECT_VERSION@
+Requires:
+<<<<<<< HEAD
+Libs.private: -lm @CMAKE_THREAD_LIBS_INIT@ @PKG_DL_LIBS@
+Libs: -L${libdir} -lgmx@GMX_LIBS_SUFFIX@
+=======
+Libs.private: @CMAKE_THREAD_LIBS_INIT@ @PKG_DL_LIBS@ @OpenMP_LINKER_FLAGS@
+Libs: -L${libdir} -lgmx@GMX_LIBS_SUFFIX@ -lm
+>>>>>>> 2aa1ce7f6f65a45829ff249723a2667c864a68b2
+Cflags: -I${includedir} @PKG_CFLAGS@
+
